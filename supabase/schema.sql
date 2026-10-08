@@ -70,6 +70,18 @@ CREATE TABLE IF NOT EXISTS promo_codes (
   active      BOOLEAN NOT NULL DEFAULT true
 );
 
+-- Platform settings (key/value). platform_fee_percent = YOUR cut of each
+-- order in percent; printers receive the rest. Editable in the admin
+-- Payouts tab.
+CREATE TABLE IF NOT EXISTS platform_settings (
+  key   TEXT PRIMARY KEY,
+  value TEXT NOT NULL
+);
+
+-- Payout tracking on orders (set by the admin Payouts tab).
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS payout_status TEXT NOT NULL DEFAULT 'unpaid';
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS payout_note  TEXT DEFAULT '';
+
 -- ----------------------------------------------------------------------------
 -- Row Level Security
 -- ----------------------------------------------------------------------------
@@ -81,6 +93,7 @@ ALTER TABLE orders        ENABLE ROW LEVEL SECURITY;
 ALTER TABLE customers     ENABLE ROW LEVEL SECURITY;
 ALTER TABLE print_partners ENABLE ROW LEVEL SECURITY;
 ALTER TABLE promo_codes   ENABLE ROW LEVEL SECURITY;
+ALTER TABLE platform_settings ENABLE ROW LEVEL SECURITY;
 
 -- Anyone can read ACTIVE products (storefront catalog).
 DROP POLICY IF EXISTS "public_read_active_products" ON products;
@@ -108,53 +121,46 @@ CREATE POLICY "public_insert_customers"
 -- (server code: lib/supabase.ts → getSupabase()).
 
 -- ----------------------------------------------------------------------------
--- Seed data — mirrors lib/products.ts DEMO_PRODUCTS exactly (ids p1..p8)
+-- Seed data — mirrors lib/products.ts DEMO_PRODUCTS exactly (t-shirts & mugs)
 -- ----------------------------------------------------------------------------
 
 INSERT INTO products
   (id, name, description, base_price, category, image_url, colors, sizes, tags, collection, active)
 VALUES
-  ('p1', 'Essential Crew Tee',
+  ('t1', 'Essential Crew Tee',
    'A heavyweight 100% cotton tee with a perfect everyday fit. Your design, printed in crisp high resolution.',
    2499, 'tshirts', 'https://picsum.photos/seed/printmate-tee1/800/800',
    ARRAY['Black','White','Navy','Heather Gray'], ARRAY['XS','S','M','L','XL','XXL'],
    ARRAY['memes','bestseller'], 'memes', true),
-  ('p2', 'CloudSoft Hoodie',
-   'Ultra-soft fleece hoodie with a cozy double-lined hood. A gift they will actually wear.',
-   4999, 'hoodies', 'https://picsum.photos/seed/printmate-hoodie1/800/800',
-   ARRAY['Black','Charcoal','Purple'], ARRAY['S','M','L','XL','XXL'],
-   ARRAY['romantic-gifts','cozy'], 'romantic-gifts', true),
-  ('p3', 'Morning Roast Mug',
-   '11oz ceramic mug with a glossy finish. Dishwasher and microwave safe — humor included free.',
-   1499, 'mugs', 'https://picsum.photos/seed/printmate-mug1/800/800',
-   ARRAY['White','Black'], ARRAY['11oz'],
-   ARRAY['political-humor','funny'], 'political-humor', true),
-  ('p4', 'Gallery Poster 18×24',
-   'Museum-quality matte poster on thick archival paper. Ships rolled in a protective tube.',
-   1999, 'posters', 'https://picsum.photos/seed/printmate-poster1/800/800',
-   ARRAY['White'], ARRAY['18×24'],
-   ARRAY['memes','romantic-gifts','wall-art'], 'memes', true),
-  ('p5', 'Vinyl Sticker Pack',
-   'Set of 5 weatherproof vinyl stickers with vibrant UV-resistant inks. Laptops, bottles, everything.',
-   999, 'stickers', 'https://picsum.photos/seed/printmate-sticker1/800/800',
-   ARRAY['Multi'], ARRAY['Pack of 5'],
-   ARRAY['memes'], 'memes', true),
-  ('p6', 'Vintage Wash Tee',
+  ('t2', 'Vintage Wash Tee',
    'Garment-dyed tee with a lived-in vintage feel. Soft from day one, funnier every wear.',
    2799, 'tshirts', 'https://picsum.photos/seed/printmate-tee2/800/800',
    ARRAY['Washed Black','Washed Navy','Sand'], ARRAY['S','M','L','XL','XXL'],
    ARRAY['political-humor'], 'political-humor', true),
-  ('p7', 'Studio Zip Hoodie',
-   'Full-zip midweight hoodie with metal zipper and side pockets. Street-ready comfort.',
-   5499, 'hoodies', 'https://picsum.photos/seed/printmate-hoodie2/800/800',
-   ARRAY['Black','Gray','Coral'], ARRAY['S','M','L','XL'],
-   ARRAY['memes','new'], NULL, true),
-  ('p8', 'Enamel Camp Mug',
+  ('t3', 'Heavyweight Boxy Tee',
+   'Thick, structured boxy-fit tee with a premium streetwear feel. Built to hold bold prints.',
+   2999, 'tshirts', 'https://picsum.photos/seed/printmate-tee3/800/800',
+   ARRAY['Black','White','Forest'], ARRAY['S','M','L','XL','XXL'],
+   ARRAY['memes','new'], 'memes', true),
+  ('m1', 'Morning Roast Mug',
+   '11oz ceramic mug with a glossy finish. Dishwasher and microwave safe — humor included free.',
+   1499, 'mugs', 'https://picsum.photos/seed/printmate-mug1/800/800',
+   ARRAY['White','Black'], ARRAY['11oz'],
+   ARRAY['political-humor','funny'], 'political-humor', true),
+  ('m2', 'Enamel Camp Mug',
    'Classic enamel campfire mug with a speckled finish. For slow mornings and sweet notes.',
    1899, 'mugs', 'https://picsum.photos/seed/printmate-mug2/800/800',
    ARRAY['White/Black rim','White/Coral rim'], ARRAY['12oz'],
-   ARRAY['romantic-gifts'], 'romantic-gifts', true)
+   ARRAY['romantic-gifts'], 'romantic-gifts', true),
+  ('m3', 'Magic Reveal Mug',
+   'Color-changing 11oz mug — pour hot coffee and watch your design magically appear.',
+   1699, 'mugs', 'https://picsum.photos/seed/printmate-mug3/800/800',
+   ARRAY['Black'], ARRAY['11oz'],
+   ARRAY['memes','new'], 'memes', true)
 ON CONFLICT (id) DO NOTHING;
+
+-- Retire the old broader catalog (hoodies/posters/stickers) — focus on tees & mugs.
+UPDATE products SET active = false WHERE category NOT IN ('tshirts', 'mugs');
 
 -- ----------------------------------------------------------------------------
 -- Seed data — print partners (order routing targets)
@@ -178,8 +184,30 @@ VALUES
 ON CONFLICT (id) DO NOTHING;
 
 -- ----------------------------------------------------------------------------
+-- Seed data — platform settings
+-- ----------------------------------------------------------------------------
+
+INSERT INTO platform_settings (key, value)
+VALUES ('platform_fee_percent', '30')
+ON CONFLICT (key) DO NOTHING;
+
+-- ----------------------------------------------------------------------------
+-- Storage — public bucket for product photos uploaded from the admin panel
+-- ----------------------------------------------------------------------------
+
+INSERT INTO storage.buckets (id, name, public)
+VALUES ('product-images', 'product-images', true)
+ON CONFLICT (id) DO NOTHING;
+
+DROP POLICY IF EXISTS "public read product images" ON storage.objects;
+CREATE POLICY "public read product images"
+  ON storage.objects FOR SELECT
+  TO anon
+  USING (bucket_id = 'product-images');
+
+-- ----------------------------------------------------------------------------
 -- Done. Sanity check:
---   SELECT count(*) FROM products;      -- expect 8
---   SELECT count(*) FROM print_partners; -- expect 3
---   SELECT code, percent_off FROM promo_codes; -- WELCOME10, STUDIO15
+--   SELECT count(*) FROM products WHERE active; -- expect 6 (t-shirts & mugs)
+--   SELECT count(*) FROM print_partners;        -- expect 3
+--   SELECT key, value FROM platform_settings;   -- platform_fee_percent = 30
 -- ----------------------------------------------------------------------------
