@@ -36,6 +36,10 @@ export default function Navbar() {
     }`;
 
   return (
+    <>
+      <div className="bg-gradient-to-r from-brand-600 via-brand-500 to-coral-500 px-4 py-2 text-center text-xs font-bold uppercase tracking-wider text-white">
+        Free US shipping on orders over $50&nbsp;&nbsp;·&nbsp;&nbsp;Printed in the USA
+      </div>
     <header className="sticky top-0 z-40 border-b border-line/60 bg-ink/80 backdrop-blur-xl">
       <nav className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6">
         <Link href="/" className="flex items-center gap-2" onClick={closeMobile}>
@@ -174,5 +178,6 @@ export default function Navbar() {
         </div>
       )}
     </header>
+    </>
   );
 }
