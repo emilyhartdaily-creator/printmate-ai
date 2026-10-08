@@ -2,7 +2,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import type { Product } from '@/lib/types';
 import { formatPrice } from '@/lib/format';
-import { CATEGORY_LABELS } from '@/lib/types';
+import { categoryLabel } from '@/lib/types';
 
 export default function ProductCard({ product }: { product: Product }) {
   return (
@@ -19,7 +19,7 @@ export default function ProductCard({ product }: { product: Product }) {
           className="object-cover transition-transform duration-300 group-hover:scale-105"
         />
         <span className="badge absolute left-3 top-3 !bg-ink/70 backdrop-blur">
-          {CATEGORY_LABELS[product.category]}
+          {categoryLabel(product.category)}
         </span>
       </div>
       <div className="flex flex-1 flex-col gap-2 p-4">
