@@ -23,7 +23,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={syne.variable}>
-      <body className="bg-ink text-zinc-100 font-sans antialiased min-h-screen">
+      <body className="bg-paper text-ink font-sans antialiased min-h-screen">
         <CartProvider>{children}</CartProvider>
       </body>
     </html>

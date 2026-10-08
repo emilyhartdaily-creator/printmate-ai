@@ -2,67 +2,63 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --bg: #0a0a12;
-  --surface: #12121c;
-}
-
 html {
   scroll-behavior: smooth;
 }
 
 body {
-  background: radial-gradient(
-      1200px 600px at 80% -10%,
-      rgba(139, 92, 246, 0.14),
+  background:
+    radial-gradient(
+      1100px 520px at 85% -10%,
+      rgba(46, 107, 255, 0.07),
       transparent
     ),
     radial-gradient(
-      900px 500px at 10% 10%,
-      rgba(255, 107, 107, 0.08),
+      800px 480px at 8% 8%,
+      rgba(249, 115, 22, 0.05),
       transparent
     ),
-    var(--bg);
+    #faf9f6;
 }
 
 @layer components {
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-brand-500 to-coral-500 px-6 py-3 font-display font-bold text-white shadow-lg shadow-brand-600/30 transition hover:brightness-110 active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none;
+    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-brand-600 to-brand-500 px-6 py-3 font-display font-bold text-white shadow-pop transition hover:brightness-110 active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none;
   }
   .btn-secondary {
-    @apply inline-flex items-center justify-center gap-2 rounded-xl border border-line bg-surface px-6 py-3 font-display font-bold text-zinc-100 transition hover:border-brand-500/60 hover:bg-card active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none;
+    @apply inline-flex items-center justify-center gap-2 rounded-xl border border-line bg-white px-6 py-3 font-display font-bold text-ink shadow-card transition hover:border-brand-500/60 hover:text-brand-700 active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none;
   }
   .card {
-    @apply rounded-2xl border border-line bg-card p-6 shadow-xl shadow-black/20;
+    @apply rounded-2xl border border-line bg-card p-6 shadow-card;
   }
   .input {
-    @apply w-full rounded-xl border border-line bg-ink px-4 py-3 text-zinc-100 placeholder:text-muted outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-500/30;
+    @apply w-full rounded-xl border border-line bg-white px-4 py-3 text-ink placeholder:text-muted outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-500/25;
   }
   .label {
-    @apply mb-1.5 block text-sm font-semibold text-zinc-300;
+    @apply mb-1.5 block text-sm font-semibold text-ink;
   }
   .badge {
-    @apply inline-flex items-center rounded-full border border-brand-500/40 bg-brand-500/10 px-3 py-1 text-xs font-bold uppercase tracking-wider text-brand-300;
+    @apply inline-flex items-center rounded-full border border-brand-500/30 bg-brand-100 px-3 py-1 text-xs font-bold uppercase tracking-wider text-brand-700;
   }
   .section-title {
-    @apply font-display text-3xl md:text-4xl font-extrabold tracking-tight;
+    @apply font-display text-3xl md:text-4xl font-extrabold tracking-tight text-ink;
   }
   .gradient-text {
-    @apply bg-gradient-to-r from-brand-400 via-coral-400 to-brand-400 bg-clip-text text-transparent;
+    @apply bg-gradient-to-r from-brand-600 via-brand-500 to-coral-500 bg-clip-text text-transparent;
   }
   .chip {
-    @apply cursor-pointer rounded-full border border-line bg-surface px-4 py-2 text-sm font-semibold text-zinc-300 transition hover:border-brand-500/60;
+    @apply cursor-pointer rounded-full border border-line bg-white px-4 py-2 text-sm font-semibold text-ink shadow-sm transition hover:border-brand-500/60;
   }
   .chip-active {
-    @apply border-transparent bg-gradient-to-r from-brand-500 to-coral-500 text-white;
+    @apply border-transparent bg-gradient-to-r from-brand-600 to-brand-500 text-white shadow-pop;
   }
   .table {
-    @apply w-full text-left text-sm;
+    @apply w-full text-left text-sm text-ink;
   }
   .table th {
     @apply border-b border-line px-4 py-3 text-xs uppercase tracking-wider text-muted;
   }
   .table td {
-    @apply border-b border-line/60 px-4 py-3 align-top;
+    @apply border-b border-line/70 px-4 py-3 align-top;
   }
 }

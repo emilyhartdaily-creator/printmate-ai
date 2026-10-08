@@ -9,17 +9,17 @@ const STEPS = [
   {
     n: '01',
     title: 'Design',
-    text: 'Describe your idea in the AI Studio or upload artwork. You see a live preview on the product.',
+    text: 'Chat with our AI designer about your idea — or upload your own artwork — and preview it live on any product.',
   },
   {
     n: '02',
     title: 'We print',
-    text: 'Your order is routed to the nearest local print partner for fast, high-quality printing.',
+    text: 'Your order goes to the nearest trusted print partner for fast, high-quality printing.',
   },
   {
     n: '03',
     title: 'Delivered',
-    text: 'Printed on demand and shipped straight to your door — no inventory, no waste.',
+    text: 'Printed on demand and shipped straight to your door. No inventory, no waste, no hassle.',
   },
 ] as const;
 
@@ -39,21 +39,21 @@ const TRUST = [
 const TESTIMONIALS = [
   {
     quote:
-      'Designed a hoodie in the Studio in like two minutes and it showed up looking exactly like the preview. My new favorite thing to wear.',
+      'I designed a mug for my dad\u2019s birthday in the chat studio — it took two minutes and the print looks exactly like the preview.',
     name: 'Jessica M.',
     city: 'Austin, TX',
   },
   {
     quote:
-      'Ordered matching tees for our whole family reunion. Print quality is legit — colors pop and the fabric feels premium.',
+      'Ordered matching tees for our whole family reunion. The colors pop, the fabric feels premium, and they arrived fast.',
     name: 'Marcus T.',
     city: 'Columbus, OH',
   },
   {
     quote:
-      'I sell my designs through PrintMate now. Zero inventory, zero hassle, and my customers keep coming back for more.',
-    name: 'Emily R.',
-    city: 'Portland, OR',
+      'The AI designer nailed my idea on the first try. My custom tee gets compliments everywhere I go.',
+    name: 'Rachel K.',
+    city: 'Denver, CO',
   },
 ] as const;
 
@@ -72,8 +72,9 @@ export default async function HomePage() {
             <span className="gradient-text">Design it.</span> We print it.
           </h1>
           <p className="mx-auto mt-6 max-w-xl text-lg text-muted">
-            Turn your ideas into custom tees and mugs. Design with AI in
-            seconds, printed on demand and delivered to your door.
+            Create one-of-a-kind tees and mugs in minutes. Tell our AI
+            designer what you want, preview it live, and we print and deliver
+            it to your door.
           </p>
           <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
             <Link href="/studio" className="btn-primary w-full sm:w-auto">
@@ -96,7 +97,7 @@ export default async function HomePage() {
         <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6">
           <div className="flex items-end justify-between">
             <h2 className="section-title">Trending now</h2>
-            <Link href="/shop" className="text-sm font-bold text-brand-300 transition hover:text-brand-400">
+            <Link href="/shop" className="text-sm font-bold text-brand-600 transition hover:text-brand-700">
               View all →
             </Link>
           </div>
@@ -117,11 +118,11 @@ export default async function HomePage() {
                 href={`/collections/${slug}`}
                 className="card group transition-all hover:-translate-y-1 hover:border-brand-500/50"
               >
-                <h3 className="font-display text-xl font-extrabold transition group-hover:text-brand-300">
+                <h3 className="font-display text-xl font-extrabold transition group-hover:text-brand-600">
                   {COLLECTION_META[slug].title}
                 </h3>
                 <p className="mt-2 text-sm text-muted">{COLLECTION_META[slug].tagline}</p>
-                <p className="mt-4 text-sm font-bold text-brand-300">Explore →</p>
+                <p className="mt-4 text-sm font-bold text-brand-600">Explore →</p>
               </Link>
             ))}
           </div>
@@ -164,11 +165,11 @@ export default async function HomePage() {
                 <div className="text-lg tracking-widest text-brand-400" aria-label="5 out of 5 stars">
                   ★★★★★
                 </div>
-                <blockquote className="mt-3 flex-1 text-sm leading-relaxed text-zinc-200">
+                <blockquote className="mt-3 flex-1 text-sm leading-relaxed text-ink">
                   “{t.quote}”
                 </blockquote>
                 <figcaption className="mt-4 text-sm">
-                  <span className="font-bold text-zinc-100">{t.name}</span>
+                  <span className="font-bold text-ink">{t.name}</span>
                   <span className="text-muted"> · {t.city}</span>
                 </figcaption>
               </figure>
@@ -184,8 +185,8 @@ export default async function HomePage() {
               Your next favorite thing <span className="gradient-text">starts with an idea.</span>
             </h2>
             <p className="relative mx-auto mt-4 max-w-lg text-muted">
-              Open the Studio, type a prompt, and watch your design come to life
-              on premium products.
+              Chat with the AI designer, watch your idea come to life on
+              premium products, and check out in minutes.
             </p>
             <Link href="/studio" className="btn-primary relative mt-8">
               Create yours today
