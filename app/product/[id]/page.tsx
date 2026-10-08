@@ -4,6 +4,9 @@ import Footer from '@/components/Footer';
 import ProductDetail from '@/components/ProductDetail';
 import { getProduct } from '@/lib/products';
 
+
+// Revalidate catalog data every 5 minutes so admin/DB changes go live without a redeploy.
+export const revalidate = 300;
 export default async function ProductPage({
   params,
   searchParams,
