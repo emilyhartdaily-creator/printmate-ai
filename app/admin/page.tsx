@@ -3,25 +3,43 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import { ADMIN_RESOURCES, type AdminResource } from '@/lib/types';
+import { ADMIN_RESOURCES, categoryLabel, type AdminResource } from '@/lib/types';
 import { formatPrice } from '@/lib/format';
 
-type FieldType = 'text' | 'number' | 'checkbox' | 'textarea';
+type FieldType =
+  | 'text'
+  | 'number'
+  | 'dollars'
+  | 'checkbox'
+  | 'textarea'
+  | 'select'
+  | 'list';
 
 interface FieldDef {
   name: string;
   label: string;
   type: FieldType;
+  /** fixed options for select */
+  options?: string[];
+  /** allow typing a brand-new value for select */
+  allowCustom?: boolean;
   /** hide from table view (long text/json) */
   tableHide?: boolean;
 }
 
+const PRODUCT_CATEGORIES = ['tshirts', 'hoodies', 'mugs', 'posters', 'stickers'];
+const PRODUCT_COLLECTIONS = ['(none)', 'memes', 'political-humor', 'romantic-gifts'];
+
 const FIELDS: Record<AdminResource, FieldDef[]> = {
   products: [
     { name: 'name', label: 'Name', type: 'text' },
-    { name: 'base_price', label: 'Price (cents)', type: 'number' },
-    { name: 'category', label: 'Category', type: 'text' },
+    { name: 'base_price', label: 'Price (USD)', type: 'dollars' },
+    { name: 'category', label: 'Category', type: 'select', allowCustom: true },
     { name: 'image_url', label: 'Image URL', type: 'text', tableHide: true },
+    { name: 'colors', label: 'Colors (comma separated)', type: 'list', tableHide: true },
+    { name: 'sizes', label: 'Sizes (comma separated)', type: 'list', tableHide: true },
+    { name: 'tags', label: 'Tags (comma separated)', type: 'list', tableHide: true },
+    { name: 'collection', label: 'Collection', type: 'select', options: PRODUCT_COLLECTIONS, tableHide: true },
     { name: 'description', label: 'Description', type: 'textarea', tableHide: true },
     { name: 'active', label: 'Active', type: 'checkbox' },
   ],
@@ -117,15 +135,63 @@ function ResourceTab({ resource }: { resource: AdminResource }) {
       const n = Number(value);
       return Number.isFinite(n) ? n : null;
     }
+    if (def.type === 'dollars') {
+      const n = Number(value);
+      return Number.isFinite(n) && n >= 0 ? Math.round(n * 100) : null;
+    }
+    if (def.type === 'list') {
+      return value
+        .split(',')
+        .map((s) => s.trim())
+        .filter((s) => s.length > 0);
+    }
     if (def.type === 'checkbox') return value === 'true' || value === 'on';
     return value;
+  }
+
+  /** Display value for a select field's options (pretty category names). */
+  function optionLabel(def: FieldDef, value: string): string {
+    if (def.name === 'category') return categoryLabel(value);
+    return value;
+  }
+
+  /** All category choices: known ones plus any custom ones already in use. */
+  const categoryOptions = useMemo(() => {
+    const opts = [...PRODUCT_CATEGORIES];
+    if (resource === 'products') {
+      for (const row of rows) {
+        const c = String(row.category ?? '');
+        if (c && !opts.includes(c)) opts.push(c);
+      }
+    }
+    return opts;
+  }, [resource, rows]);
+
+  function selectOptions(def: FieldDef): string[] {
+    if (def.name === 'category' && resource === 'products')
+      return categoryOptions;
+    return def.options ?? [];
   }
 
   function formToBody(): Record<string, unknown> {
     const body: Record<string, unknown> = {};
     for (const def of fields) {
+      // Custom-typed select value (e.g. a brand-new category name).
+      if (def.type === 'select' && def.allowCustom && form[def.name] === '__custom') {
+        const custom = (form[`${def.name}_custom`] ?? '').trim();
+        if (custom) body[def.name] = custom.toLowerCase().replace(/\s+/g, '-');
+        continue;
+      }
       const raw = form[def.name];
-      if (raw === undefined || raw === '') continue;
+      if (raw === undefined || raw === '') {
+        // Explicitly clear collection when "(none)" is chosen.
+        if (def.name === 'collection' && raw === '') continue;
+        continue;
+      }
+      if (def.name === 'collection' && raw === '(none)') {
+        body[def.name] = null;
+        continue;
+      }
       if (def.type === 'checkbox') body[def.name] = raw === 'true';
       else body[def.name] = coerce(def, raw);
     }
@@ -158,14 +224,24 @@ function ResourceTab({ resource }: { resource: AdminResource }) {
     const f: Record<string, string> = {};
     for (const def of fields) {
       const v = row[def.name];
-      f[def.name] =
-        def.type === 'checkbox'
-          ? v
-            ? 'true'
-            : 'false'
-          : v === null || v === undefined
-            ? ''
-            : String(v);
+      if (def.type === 'checkbox') {
+        f[def.name] = v ? 'true' : 'false';
+      } else if (def.type === 'dollars') {
+        f[def.name] =
+          typeof v === 'number' ? (v / 100).toFixed(2).replace(/\.?0+$/, '') : '';
+      } else if (def.type === 'list') {
+        f[def.name] = Array.isArray(v) ? v.join(', ') : '';
+      } else if (def.type === 'select' && def.allowCustom) {
+        const s = v === null || v === undefined ? '' : String(v);
+        if (s && !selectOptions(def).includes(s)) {
+          f[def.name] = '__custom';
+          f[`${def.name}_custom`] = s;
+        } else {
+          f[def.name] = s;
+        }
+      } else {
+        f[def.name] = v === null || v === undefined ? '' : String(v);
+      }
     }
     setForm(f);
     setEditingId(String(row.id ?? ''));
@@ -240,6 +316,63 @@ function ResourceTab({ resource }: { resource: AdminResource }) {
                 <textarea
                   className="input"
                   rows={3}
+                  value={form[def.name] ?? ''}
+                  onChange={(e) => setField(def.name, e.target.value)}
+                />
+              </div>
+            ) : def.type === 'select' ? (
+              <div key={def.name}>
+                <label className="label">{def.label}</label>
+                <select
+                  className="input"
+                  value={form[def.name] ?? ''}
+                  onChange={(e) => setField(def.name, e.target.value)}
+                >
+                  <option value="">Choose…</option>
+                  {selectOptions(def).map((o) => (
+                    <option key={o} value={o}>
+                      {optionLabel(def, o)}
+                    </option>
+                  ))}
+                  {def.allowCustom && (
+                    <option value="__custom">＋ New category…</option>
+                  )}
+                </select>
+                {def.allowCustom && form[def.name] === '__custom' && (
+                  <input
+                    type="text"
+                    className="input mt-2"
+                    placeholder="e.g. Hoodies"
+                    value={form[`${def.name}_custom`] ?? ''}
+                    onChange={(e) => setField(`${def.name}_custom`, e.target.value)}
+                  />
+                )}
+              </div>
+            ) : def.type === 'dollars' ? (
+              <div key={def.name}>
+                <label className="label">{def.label}</label>
+                <div className="relative">
+                  <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 font-bold text-muted">
+                    $
+                  </span>
+                  <input
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    className="input !pl-8"
+                    placeholder="24.99"
+                    value={form[def.name] ?? ''}
+                    onChange={(e) => setField(def.name, e.target.value)}
+                  />
+                </div>
+              </div>
+            ) : def.type === 'list' ? (
+              <div key={def.name}>
+                <label className="label">{def.label}</label>
+                <input
+                  type="text"
+                  className="input"
+                  placeholder="Black, White, Navy"
                   value={form[def.name] ?? ''}
                   onChange={(e) => setField(def.name, e.target.value)}
                 />
