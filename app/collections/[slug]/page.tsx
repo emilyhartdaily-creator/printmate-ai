@@ -5,6 +5,9 @@ import ProductCard from '@/components/ProductCard';
 import { getProducts } from '@/lib/products';
 import { COLLECTION_META, type CollectionSlug } from '@/lib/types';
 
+
+// Revalidate catalog data every 5 minutes so admin/DB changes go live without a redeploy.
+export const revalidate = 300;
 const SLUGS = Object.keys(COLLECTION_META) as CollectionSlug[];
 
 export function generateStaticParams() {
