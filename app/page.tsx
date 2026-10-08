@@ -30,6 +30,33 @@ const STATS = [
   { value: '0', label: 'Minimum order' },
 ] as const;
 
+const TRUST = [
+  'Made in the USA',
+  '30-day money-back guarantee',
+  'Secure checkout',
+] as const;
+
+const TESTIMONIALS = [
+  {
+    quote:
+      'Designed a hoodie in the Studio in like two minutes and it showed up looking exactly like the preview. My new favorite thing to wear.',
+    name: 'Jessica M.',
+    city: 'Austin, TX',
+  },
+  {
+    quote:
+      'Ordered matching tees for our whole family reunion. Print quality is legit — colors pop and the fabric feels premium.',
+    name: 'Marcus T.',
+    city: 'Columbus, OH',
+  },
+  {
+    quote:
+      'I sell my designs through PrintMate now. Zero inventory, zero hassle, and my customers keep coming back for more.',
+    name: 'Emily R.',
+    city: 'Portland, OR',
+  },
+] as const;
+
 export default async function HomePage() {
   const products = await getProducts();
   const trending = products.slice(0, 4);
@@ -56,6 +83,13 @@ export default async function HomePage() {
             <Link href="/shop" className="btn-secondary w-full sm:w-auto">
               Shop the Collection
             </Link>
+          </div>
+          <div className="mx-auto mt-8 flex max-w-2xl flex-wrap items-center justify-center gap-x-8 gap-y-2 text-sm font-semibold text-muted">
+            {TRUST.map((t) => (
+              <span key={t} className="inline-flex items-center gap-1.5">
+                <span className="text-brand-400">✓</span> {t}
+              </span>
+            ))}
           </div>
         </section>
 
@@ -118,6 +152,27 @@ export default async function HomePage() {
                 </p>
                 <p className="mt-1 text-sm text-muted">{s.label}</p>
               </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Testimonials */}
+        <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6">
+          <h2 className="section-title text-center">Loved across the USA</h2>
+          <div className="mt-8 grid gap-6 md:grid-cols-3">
+            {TESTIMONIALS.map((t) => (
+              <figure key={t.name} className="card flex flex-col">
+                <div className="text-lg tracking-widest text-brand-400" aria-label="5 out of 5 stars">
+                  ★★★★★
+                </div>
+                <blockquote className="mt-3 flex-1 text-sm leading-relaxed text-zinc-200">
+                  “{t.quote}”
+                </blockquote>
+                <figcaption className="mt-4 text-sm">
+                  <span className="font-bold text-zinc-100">{t.name}</span>
+                  <span className="text-muted"> · {t.city}</span>
+                </figcaption>
+              </figure>
             ))}
           </div>
         </section>
