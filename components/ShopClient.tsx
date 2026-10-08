@@ -2,25 +2,38 @@
 
 import { useMemo, useState } from 'react';
 import ProductCard from '@/components/ProductCard';
-import { CATEGORY_LABELS, type Product, type ProductCategory } from '@/lib/types';
+import {
+  CATEGORY_LABELS,
+  categoryLabel,
+  type Product,
+} from '@/lib/types';
 
 type SortMode = 'featured' | 'price-asc' | 'price-desc';
-
-const CATEGORIES: (ProductCategory | 'all')[] = [
-  'all',
-  ...Object.keys(CATEGORY_LABELS),
-] as (ProductCategory | 'all')[];
 
 export default function ShopClient({
   products,
   initialCategory = 'all',
 }: {
   products: Product[];
-  initialCategory?: ProductCategory | 'all';
+  initialCategory?: string;
 }) {
-  const [category, setCategory] = useState<ProductCategory | 'all'>(initialCategory);
+  const [category, setCategory] = useState<string>(initialCategory);
   const [query, setQuery] = useState('');
   const [sort, setSort] = useState<SortMode>('featured');
+
+  // Category chips: known labels first, then any custom categories found
+  // in the live catalog (added via the admin panel).
+  const categories = useMemo(() => {
+    const seen = new Set<string>(Object.keys(CATEGORY_LABELS));
+    const extra: string[] = [];
+    for (const p of products) {
+      if (!seen.has(p.category)) {
+        seen.add(p.category);
+        extra.push(p.category);
+      }
+    }
+    return ['all', ...Object.keys(CATEGORY_LABELS), ...extra];
+  }, [products]);
 
   const visible = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -50,7 +63,7 @@ export default function ShopClient({
 
       <div className="mt-6 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div className="flex flex-wrap gap-2">
-          {CATEGORIES.map((c) => (
+          {categories.map((c) => (
             <button
               key={c}
               type="button"
@@ -58,7 +71,7 @@ export default function ShopClient({
               className={`chip ${category === c ? 'chip-active' : ''}`}
               aria-pressed={category === c}
             >
-              {c === 'all' ? 'All' : CATEGORY_LABELS[c]}
+              {c === 'all' ? 'All' : categoryLabel(c)}
             </button>
           ))}
         </div>
