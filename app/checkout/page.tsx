@@ -67,7 +67,7 @@ export default function CheckoutPage() {
   }
 
   return (
-    <div className="min-h-screen bg-ink">
+    <div className="min-h-screen bg-paper">
       <Navbar />
       <main className="mx-auto max-w-5xl px-4 py-12">
         <h1 className="section-title font-display">
