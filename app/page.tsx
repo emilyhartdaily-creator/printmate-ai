@@ -24,7 +24,7 @@ const STEPS = [
 ] as const;
 
 const STATS = [
-  { value: '8+', label: 'Product blanks' },
+  { value: '6', label: 'Product blanks' },
   { value: '24h', label: 'Avg. print start' },
   { value: '100%', label: 'Print-on-demand' },
   { value: '0', label: 'Minimum order' },
@@ -72,9 +72,8 @@ export default async function HomePage() {
             <span className="gradient-text">Design it.</span> We print it.
           </h1>
           <p className="mx-auto mt-6 max-w-xl text-lg text-muted">
-            Turn your ideas into custom tees, hoodies, mugs, posters and
-            stickers. Design with AI in seconds, printed on demand and
-            delivered to your door.
+            Turn your ideas into custom tees and mugs. Design with AI in
+            seconds, printed on demand and delivered to your door.
           </p>
           <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
             <Link href="/studio" className="btn-primary w-full sm:w-auto">
