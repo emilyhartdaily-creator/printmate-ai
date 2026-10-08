@@ -53,7 +53,7 @@ export default function CartPage() {
                   <div className="flex flex-1 flex-col">
                     <div className="flex items-start justify-between gap-3">
                       <div>
-                        <h3 className="font-display font-bold text-zinc-100">
+                        <h3 className="font-display font-bold text-ink">
                           {item.name}
                         </h3>
                         <p className="mt-1 text-xs text-muted">
@@ -73,7 +73,7 @@ export default function CartPage() {
                       <div className="flex items-center rounded-xl border border-line bg-surface">
                         <button
                           type="button"
-                          className="px-3 py-1.5 font-bold text-zinc-300 transition hover:text-white"
+                          className="px-3 py-1.5 font-bold text-muted transition hover:text-ink"
                           onClick={() => updateQty(item.key, item.qty - 1)}
                           aria-label="Decrease quantity"
                         >
@@ -84,14 +84,14 @@ export default function CartPage() {
                         </span>
                         <button
                           type="button"
-                          className="px-3 py-1.5 font-bold text-zinc-300 transition hover:text-white"
+                          className="px-3 py-1.5 font-bold text-muted transition hover:text-ink"
                           onClick={() => updateQty(item.key, item.qty + 1)}
                           aria-label="Increase quantity"
                         >
                           +
                         </button>
                       </div>
-                      <p className="font-extrabold text-white">
+                      <p className="font-extrabold text-ink">
                         {formatPrice(item.base_price * item.qty)}
                       </p>
                     </div>
@@ -111,7 +111,7 @@ export default function CartPage() {
                   <span>Shipping</span>
                   <span>Calculated at checkout</span>
                 </div>
-                <div className="flex justify-between border-t border-line pt-3 text-base font-extrabold text-white">
+                <div className="flex justify-between border-t border-line pt-3 text-base font-extrabold text-ink">
                   <span>Subtotal</span>
                   <span>{formatPrice(subtotal)}</span>
                 </div>
