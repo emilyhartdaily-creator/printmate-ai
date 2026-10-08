@@ -79,10 +79,16 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  // Default: Pollinations (free, no key needed)
+  // Default: Pollinations (free, no key needed).
+  // Enhance the raw prompt with print-design quality modifiers so the art
+  // looks like a real merch graphic, not a random illustration.
+  const enhancedPrompt =
+    `professional t-shirt graphic design, vector-style illustration, ` +
+    `bold clean shapes, high contrast, centered composition, ` +
+    `isolated on a plain white background, print-ready artwork: ${prompt}`;
   const seed = Math.floor(Math.random() * 1_000_000);
   const imageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(
-    prompt,
+    enhancedPrompt,
   )}?width=1024&height=1024&seed=${seed}&nologo=true`;
   return NextResponse.json({ imageUrl });
 }
