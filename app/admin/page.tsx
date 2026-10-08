@@ -59,6 +59,7 @@ const TAB_LABELS: Record<string, string> = {
   customers: 'Customers',
   print_partners: 'Print partners',
   promo_codes: 'Promo codes',
+  payouts: 'Payouts',
   analytics: 'Analytics',
 };
 
@@ -82,6 +83,8 @@ function ResourceTab({ resource }: { resource: AdminResource }) {
   const [error, setError] = useState<string | null>(null);
   const [form, setForm] = useState<Record<string, string>>({});
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
   const fields = FIELDS[resource];
 
   const load = useCallback(async () => {
@@ -168,6 +171,26 @@ function ResourceTab({ resource }: { resource: AdminResource }) {
     setEditingId(String(row.id ?? ''));
   }
 
+  async function handleImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const f = e.target.files?.[0];
+    e.target.value = '';
+    if (!f) return;
+    setUploading(true);
+    setUploadError(null);
+    try {
+      const data = new FormData();
+      data.append('file', f);
+      const res = await fetch('/api/admin/upload', { method: 'POST', body: data });
+      const json = (await res.json()) as { url?: string; error?: string };
+      if (!res.ok) throw new Error(json.error || 'Upload failed');
+      setField('image_url', json.url ?? '');
+    } catch (err) {
+      setUploadError(err instanceof Error ? err.message : 'Upload failed');
+    } finally {
+      setUploading(false);
+    }
+  }
+
   async function handleDelete(id: string) {
     if (!confirm('Delete this record?')) return;
     try {
@@ -230,6 +253,31 @@ function ResourceTab({ resource }: { resource: AdminResource }) {
                   value={form[def.name] ?? ''}
                   onChange={(e) => setField(def.name, e.target.value)}
                 />
+                {resource === 'products' && def.name === 'image_url' && (
+                  <div className="mt-2 flex flex-wrap items-center gap-3">
+                    {form.image_url ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={form.image_url}
+                        alt="Product preview"
+                        className="h-16 w-16 rounded-xl border border-line object-cover"
+                      />
+                    ) : null}
+                    <label className="btn-secondary cursor-pointer !px-4 !py-2 text-sm">
+                      {uploading ? 'Uploading…' : 'Upload photo'}
+                      <input
+                        type="file"
+                        accept="image/jpeg,image/png,image/webp,image/gif"
+                        className="hidden"
+                        disabled={uploading}
+                        onChange={handleImageUpload}
+                      />
+                    </label>
+                    {uploadError && (
+                      <span className="text-sm text-red-300">{uploadError}</span>
+                    )}
+                  </div>
+                )}
               </div>
             ),
           )}
@@ -311,6 +359,218 @@ function ResourceTab({ resource }: { resource: AdminResource }) {
           </table>
         )}
       </div>
+    </div>
+  );
+}
+
+interface PayoutRow {
+  order_id: string;
+  created_at: string;
+  partner_id: string | null;
+  partner_name: string | null;
+  partner_email: string | null;
+  total: number;
+  printer_share: number;
+  platform_share: number;
+  payout_status: 'unpaid' | 'paid' | 'na';
+}
+
+function PayoutsTab() {
+  const [rows, setRows] = useState<PayoutRow[]>([]);
+  const [fee, setFee] = useState(30);
+  const [feeInput, setFeeInput] = useState('30');
+  const [totals, setTotals] = useState({ printer: 0, platform: 0, paid: 0 });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
+
+  const load = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await fetch('/api/admin/payouts');
+      const data = (await res.json()) as {
+        rows?: PayoutRow[];
+        totals?: { printer: number; platform: number; paid: number };
+        platform_fee_percent?: number;
+        error?: string;
+      };
+      if (!res.ok) throw new Error(data.error || 'Failed to load payouts');
+      setRows(data.rows ?? []);
+      setTotals(data.totals ?? { printer: 0, platform: 0, paid: 0 });
+      const f = Number(data.platform_fee_percent ?? 30);
+      setFee(f);
+      setFeeInput(String(f));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load payouts');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    load();
+  }, [load]);
+
+  async function saveFee() {
+    setSaving(true);
+    setError(null);
+    try {
+      const res = await fetch('/api/admin/settings', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ platform_fee_percent: Number(feeInput) }),
+      });
+      const data = (await res.json()) as { error?: string };
+      if (!res.ok) throw new Error(data.error || 'Save failed');
+      await load();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Save failed');
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function markPaid(order_id: string) {
+    setError(null);
+    try {
+      const res = await fetch('/api/admin/payouts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ order_id }),
+      });
+      const data = (await res.json()) as { error?: string };
+      if (!res.ok) throw new Error(data.error || 'Update failed');
+      await load();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Update failed');
+    }
+  }
+
+  return (
+    <div className="space-y-6">
+      {error && (
+        <p className="rounded-xl border border-red-500/40 bg-red-500/10 px-4 py-3 text-sm text-red-300">
+          {error}
+        </p>
+      )}
+
+      <div className="card">
+        <h3 className="font-display text-lg font-bold">Your platform fee</h3>
+        <p className="mt-1 text-sm text-muted">
+          You keep this percent of every order. Printers automatically receive
+          the rest ({100 - fee}%).
+        </p>
+        <div className="mt-4 flex max-w-sm items-end gap-3">
+          <div className="flex-1">
+            <label className="label" htmlFor="fee-input">
+              Your cut (%)
+            </label>
+            <input
+              id="fee-input"
+              type="number"
+              min={0}
+              max={90}
+              className="input"
+              value={feeInput}
+              onChange={(e) => setFeeInput(e.target.value)}
+            />
+          </div>
+          <button className="btn-primary" onClick={saveFee} disabled={saving}>
+            {saving ? 'Saving…' : 'Save'}
+          </button>
+        </div>
+      </div>
+
+      {loading ? (
+        <p className="text-muted">Loading…</p>
+      ) : (
+        <>
+          <div className="grid gap-4 sm:grid-cols-3">
+            <div className="card">
+              <p className="text-sm text-muted">Your earnings</p>
+              <p className="font-display mt-1 text-3xl font-extrabold text-brand-300">
+                {formatPrice(totals.platform)}
+              </p>
+            </div>
+            <div className="card">
+              <p className="text-sm text-muted">Owed to printers</p>
+              <p className="font-display mt-1 text-3xl font-extrabold">
+                {formatPrice(totals.printer)}
+              </p>
+            </div>
+            <div className="card">
+              <p className="text-sm text-muted">Paid out</p>
+              <p className="font-display mt-1 text-3xl font-extrabold text-emerald-300">
+                {formatPrice(totals.paid)}
+              </p>
+            </div>
+          </div>
+
+          <div className="card overflow-x-auto">
+            {rows.length === 0 ? (
+              <p className="text-muted">No payable orders yet.</p>
+            ) : (
+              <table className="table">
+                <thead>
+                  <tr>
+                    <th className="px-3 py-2 text-left text-xs uppercase tracking-wider text-muted">Order</th>
+                    <th className="px-3 py-2 text-left text-xs uppercase tracking-wider text-muted">Printer</th>
+                    <th className="px-3 py-2 text-left text-xs uppercase tracking-wider text-muted">Total</th>
+                    <th className="px-3 py-2 text-left text-xs uppercase tracking-wider text-muted">Printer gets</th>
+                    <th className="px-3 py-2 text-left text-xs uppercase tracking-wider text-muted">You keep</th>
+                    <th className="px-3 py-2 text-left text-xs uppercase tracking-wider text-muted">Status</th>
+                    <th className="px-3 py-2 text-left text-xs uppercase tracking-wider text-muted">Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {rows.map((r) => (
+                    <tr key={r.order_id} className="border-t border-line">
+                      <td className="px-3 py-2 font-mono text-xs text-muted">
+                        {r.order_id.slice(0, 8)}
+                      </td>
+                      <td className="px-3 py-2">
+                        {r.partner_name ?? <span className="text-muted">—</span>}
+                      </td>
+                      <td className="px-3 py-2">{formatPrice(r.total)}</td>
+                      <td className="px-3 py-2">{formatPrice(r.printer_share)}</td>
+                      <td className="px-3 py-2 font-semibold text-brand-300">
+                        {formatPrice(r.platform_share)}
+                      </td>
+                      <td className="px-3 py-2">
+                        {r.payout_status === 'paid' ? (
+                          <span className="badge !border-emerald-500/40 !bg-emerald-500/10 !text-emerald-300">Paid</span>
+                        ) : r.payout_status === 'na' ? (
+                          <span className="badge">No printer</span>
+                        ) : (
+                          <span className="badge !border-amber-500/40 !bg-amber-500/10 !text-amber-300">Unpaid</span>
+                        )}
+                      </td>
+                      <td className="px-3 py-2">
+                        {r.payout_status === 'unpaid' && (
+                          <button
+                            className="text-sm font-semibold text-brand-400 hover:underline"
+                            onClick={() => markPaid(r.order_id)}
+                          >
+                            Mark paid
+                          </button>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
+
+          <p className="text-xs leading-relaxed text-muted">
+            Pay printers with Wise, PayPal or bank transfer, then mark each
+            order paid here. Fully automatic transfers need Stripe Connect
+            (each printer onboards once) — a future upgrade. Keep these records
+            for your tax filing.
+          </p>
+        </>
+      )}
     </div>
   );
 }
@@ -526,7 +786,7 @@ export default function AdminPage() {
     setAuthed(false);
   }
 
-  const tabs = [...ADMIN_RESOURCES, 'analytics'] as string[];
+  const tabs = [...ADMIN_RESOURCES, 'payouts', 'analytics'] as string[];
 
   return (
     <div className="min-h-screen bg-ink">
@@ -587,6 +847,8 @@ export default function AdminPage() {
             <div className="mt-6">
               {tab === 'analytics' ? (
                 <AnalyticsTab />
+              ) : tab === 'payouts' ? (
+                <PayoutsTab />
               ) : (
                 <ResourceTab
                   key={tab}
