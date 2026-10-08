@@ -19,7 +19,7 @@ export default function OrderSuccessPage({
   searchParams: { session_id?: string };
 }) {
   return (
-    <div className="min-h-screen bg-ink">
+    <div className="min-h-screen bg-paper">
       <Navbar />
       <ClearCart />
       <main className="mx-auto max-w-2xl px-4 py-12">
@@ -66,7 +66,7 @@ export default function OrderSuccessPage({
                         step.state === 'done'
                           ? 'border-emerald-500 bg-emerald-500/20 text-emerald-400'
                           : step.state === 'current'
-                            ? 'border-brand-500 bg-brand-500/20 text-brand-300'
+                            ? 'border-brand-500 bg-brand-500/20 text-brand-600'
                             : 'border-line bg-surface text-muted'
                       }`}
                     >
