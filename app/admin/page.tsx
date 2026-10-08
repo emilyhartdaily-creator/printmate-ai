@@ -622,7 +622,7 @@ function PayoutsTab() {
           <div className="grid gap-4 sm:grid-cols-3">
             <div className="card">
               <p className="text-sm text-muted">Your earnings</p>
-              <p className="font-display mt-1 text-3xl font-extrabold text-brand-300">
+              <p className="font-display mt-1 text-3xl font-extrabold text-brand-600">
                 {formatPrice(totals.platform)}
               </p>
             </div>
@@ -667,7 +667,7 @@ function PayoutsTab() {
                       </td>
                       <td className="px-3 py-2">{formatPrice(r.total)}</td>
                       <td className="px-3 py-2">{formatPrice(r.printer_share)}</td>
-                      <td className="px-3 py-2 font-semibold text-brand-300">
+                      <td className="px-3 py-2 font-semibold text-brand-600">
                         {formatPrice(r.platform_share)}
                       </td>
                       <td className="px-3 py-2">
@@ -922,7 +922,7 @@ export default function AdminPage() {
   const tabs = [...ADMIN_RESOURCES, 'payouts', 'analytics'] as string[];
 
   return (
-    <div className="min-h-screen bg-ink">
+    <div className="min-h-screen bg-paper">
       <Navbar />
       <main className="mx-auto max-w-6xl px-4 py-12">
         <h1 className="section-title font-display">
