@@ -203,13 +203,13 @@ export default function DesignAgentChat({ products }: { products: Product[] }) {
 
         <div
           ref={listRef}
-          className="mt-5 max-h-[52vh] min-h-64 space-y-3 overflow-y-auto rounded-xl border border-line bg-ink p-4"
+          className="mt-5 max-h-[52vh] min-h-64 space-y-3 overflow-y-auto rounded-xl border border-line bg-paper p-4"
           aria-live="polite"
         >
           {messages.length === 0 && !chatLoading ? (
             <>
               <div className="flex justify-start">
-                <div className="max-w-[85%] rounded-2xl rounded-tl-md border border-line bg-surface px-4 py-3 text-sm text-zinc-100">
+                <div className="max-w-[85%] rounded-2xl rounded-tl-md border border-line bg-surface px-4 py-3 text-sm text-ink">
                   👋 Hi! I&apos;m your PrintMate design assistant. Tell me what
                   you&apos;d like on a t-shirt or mug — a gift idea, a vibe,
                   anything.
@@ -239,12 +239,12 @@ export default function DesignAgentChat({ products }: { products: Product[] }) {
                   className={`max-w-[85%] px-4 py-3 text-sm ${
                     m.role === 'user'
                       ? 'rounded-2xl rounded-tr-md bg-brand-600 text-white'
-                      : 'rounded-2xl rounded-tl-md border border-line bg-surface text-zinc-100'
+                      : 'rounded-2xl rounded-tl-md border border-line bg-surface text-ink'
                   }`}
                 >
                   {m.pendingImage ? (
                     <span className="inline-flex items-center gap-2">
-                      <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white" />
+                      <span className="h-4 w-4 animate-spin rounded-full border-2 border-brand-500/40 border-t-brand-600" />
                       {m.content}
                     </span>
                   ) : (

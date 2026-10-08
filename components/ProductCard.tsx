@@ -23,10 +23,10 @@ export default function ProductCard({ product }: { product: Product }) {
         </span>
       </div>
       <div className="flex flex-1 flex-col gap-2 p-4">
-        <h3 className="font-display text-base font-bold leading-snug text-zinc-100 transition group-hover:text-brand-300">
+        <h3 className="font-display text-base font-bold leading-snug text-ink transition group-hover:text-brand-600">
           {product.name}
         </h3>
-        <p className="mt-auto pt-1 text-lg font-extrabold text-white">
+        <p className="mt-auto pt-1 text-lg font-extrabold text-ink">
           {formatPrice(product.base_price)}
         </p>
       </div>

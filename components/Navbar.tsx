@@ -31,8 +31,8 @@ export default function Navbar() {
   const linkCls = (href: string) =>
     `rounded-lg px-3 py-2 text-sm font-semibold transition ${
       isActive(href)
-        ? 'text-white bg-brand-500/20'
-        : 'text-zinc-300 hover:text-white hover:bg-white/5'
+        ? 'text-brand-700 bg-brand-100'
+        : 'text-muted hover:text-ink hover:bg-ink/5'
     }`;
 
   return (
@@ -40,7 +40,7 @@ export default function Navbar() {
       <div className="bg-gradient-to-r from-brand-600 via-brand-500 to-coral-500 px-4 py-2 text-center text-xs font-bold uppercase tracking-wider text-white">
         Free US shipping on orders over $50&nbsp;&nbsp;·&nbsp;&nbsp;Printed in the USA
       </div>
-    <header className="sticky top-0 z-40 border-b border-line/60 bg-ink/80 backdrop-blur-xl">
+    <header className="sticky top-0 z-40 border-b border-line/60 bg-paper/80 backdrop-blur-xl">
       <nav className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6">
         <Link href="/" className="flex items-center gap-2" onClick={closeMobile}>
           <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-brand-500 to-coral-500 font-display text-lg font-extrabold text-white">
@@ -82,17 +82,17 @@ export default function Navbar() {
             </button>
             {collectionsOpen && (
               <div
-                className="absolute left-0 mt-2 w-64 overflow-hidden rounded-xl border border-line bg-card shadow-2xl shadow-black/40"
+                className="absolute left-0 mt-2 w-64 overflow-hidden rounded-xl border border-line bg-card shadow-2xl shadow-ink/10"
                 onMouseLeave={() => setCollectionsOpen(false)}
               >
                 {COLLECTION_SLUGS.map((slug) => (
                   <Link
                     key={slug}
                     href={`/collections/${slug}`}
-                    className="block px-4 py-3 transition hover:bg-white/5"
+                    className="block px-4 py-3 transition hover:bg-ink/5"
                     onClick={() => setCollectionsOpen(false)}
                   >
-                    <span className="block text-sm font-bold text-zinc-100">
+                    <span className="block text-sm font-bold text-ink">
                       {COLLECTION_META[slug].title}
                     </span>
                     <span className="block text-xs text-muted">
@@ -108,7 +108,7 @@ export default function Navbar() {
         <div className="flex items-center gap-2">
           <Link
             href="/cart"
-            className="relative inline-flex items-center gap-2 rounded-xl border border-line bg-surface px-4 py-2 text-sm font-bold text-zinc-100 transition hover:border-brand-500/60"
+            className="relative inline-flex items-center gap-2 rounded-xl border border-line bg-surface px-4 py-2 text-sm font-bold text-ink transition hover:border-brand-500/60"
             aria-label={`Cart, ${count} items`}
           >
             <svg
@@ -134,7 +134,7 @@ export default function Navbar() {
           </Link>
           <button
             type="button"
-            className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-line bg-surface text-zinc-200 md:hidden"
+            className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-line bg-surface text-ink md:hidden"
             onClick={() => setOpen((v) => !v)}
             aria-expanded={open}
             aria-label="Toggle menu"
@@ -154,7 +154,7 @@ export default function Navbar() {
 
       {/* Mobile menu */}
       {open && (
-        <div className="border-t border-line/60 bg-ink px-4 py-4 md:hidden">
+        <div className="border-t border-line/60 bg-paper px-4 py-4 md:hidden">
           <div className="flex flex-col gap-1">
             {NAV_LINKS.map((l) => (
               <Link key={l.href} href={l.href} className={linkCls(l.href)} onClick={closeMobile}>

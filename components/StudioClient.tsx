@@ -108,7 +108,8 @@ export default function StudioClient({ products }: { products: Product[] }) {
         AI Design <span className="gradient-text">Studio</span>
       </h1>
       <p className="mt-2 text-muted">
-        Describe your design, generate it with AI, then put it on any product.
+        Chat with our AI designer — or write the prompt yourself — then put
+        your design on any product.
       </p>
 
       <div
@@ -124,7 +125,7 @@ export default function StudioClient({ products }: { products: Product[] }) {
           className={`rounded-lg px-4 py-2 text-sm font-bold transition ${
             mode === 'chat'
               ? 'bg-brand-600 text-white'
-              : 'text-muted hover:text-zinc-100'
+              : 'text-muted hover:text-ink'
           }`}
         >
           💬 Chat with the designer
@@ -137,7 +138,7 @@ export default function StudioClient({ products }: { products: Product[] }) {
           className={`rounded-lg px-4 py-2 text-sm font-bold transition ${
             mode === 'form'
               ? 'bg-brand-600 text-white'
-              : 'text-muted hover:text-zinc-100'
+              : 'text-muted hover:text-ink'
           }`}
         >
           ✍️ Write it yourself
@@ -186,7 +187,7 @@ export default function StudioClient({ products }: { products: Product[] }) {
           >
             {generating ? (
               <>
-                <span className="h-5 w-5 animate-spin rounded-full border-2 border-white/40 border-t-white" />
+                <span className="h-5 w-5 animate-spin rounded-full border-2 border-brand-500/40 border-t-brand-600" />
                 Generating…
               </>
             ) : (

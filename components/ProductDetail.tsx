@@ -68,7 +68,7 @@ export default function ProductDetail({
           <h1 className="font-display text-3xl font-extrabold tracking-tight md:text-4xl">
             {product.name}
           </h1>
-          <p className="mt-2 text-2xl font-extrabold text-white">
+          <p className="mt-2 text-2xl font-extrabold text-ink">
             {formatPrice(product.base_price)}
           </p>
           <p className="mt-4 leading-relaxed text-muted">{product.description}</p>
@@ -90,7 +90,7 @@ export default function ProductDetail({
                 className="h-16 w-16 rounded-lg border border-line object-cover"
               />
               <div className="flex-1">
-                <p className="text-sm font-bold text-zinc-100">Design applied</p>
+                <p className="text-sm font-bold text-ink">Design applied</p>
                 <p className="text-xs text-muted">Previewing live on this product.</p>
               </div>
               <button
@@ -148,7 +148,7 @@ export default function ProductDetail({
             <div className="flex items-center rounded-xl border border-line bg-surface">
               <button
                 type="button"
-                className="px-4 py-3 text-lg font-bold text-zinc-300 transition hover:text-white"
+                className="px-4 py-3 text-lg font-bold text-muted transition hover:text-ink"
                 onClick={() => setQty((q) => Math.max(1, q - 1))}
                 aria-label="Decrease quantity"
               >
@@ -159,7 +159,7 @@ export default function ProductDetail({
               </span>
               <button
                 type="button"
-                className="px-4 py-3 text-lg font-bold text-zinc-300 transition hover:text-white"
+                className="px-4 py-3 text-lg font-bold text-muted transition hover:text-ink"
                 onClick={() => setQty((q) => Math.min(99, q + 1))}
                 aria-label="Increase quantity"
               >

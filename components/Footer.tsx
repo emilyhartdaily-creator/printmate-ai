@@ -21,7 +21,7 @@ export default function Footer() {
           <p className="mb-3 text-xs font-bold uppercase tracking-wider text-muted">Shop</p>
           <ul className="space-y-2 text-sm">
             <li>
-              <Link href="/shop" className="text-zinc-300 transition hover:text-white">
+              <Link href="/shop" className="text-muted transition hover:text-ink">
                 All products
               </Link>
             </li>
@@ -29,7 +29,7 @@ export default function Footer() {
               <li key={c}>
                 <Link
                   href={`/shop?category=${c}`}
-                  className="text-zinc-300 transition hover:text-white"
+                  className="text-muted transition hover:text-ink"
                 >
                   {categoryLabel(c)}
                 </Link>
@@ -44,7 +44,7 @@ export default function Footer() {
               <li key={slug}>
                 <Link
                   href={`/collections/${slug}`}
-                  className="text-zinc-300 transition hover:text-white"
+                  className="text-muted transition hover:text-ink"
                 >
                   {COLLECTION_META[slug].title}
                 </Link>
@@ -56,12 +56,12 @@ export default function Footer() {
           <p className="mb-3 text-xs font-bold uppercase tracking-wider text-muted">Company</p>
           <ul className="space-y-2 text-sm">
             <li>
-              <Link href="/studio" className="text-zinc-300 transition hover:text-white">
+              <Link href="/studio" className="text-muted transition hover:text-ink">
                 AI Design Studio
               </Link>
             </li>
             <li>
-              <Link href="/cart" className="text-zinc-300 transition hover:text-white">
+              <Link href="/cart" className="text-muted transition hover:text-ink">
                 Cart
               </Link>
             </li>
@@ -71,7 +71,7 @@ export default function Footer() {
       <div className="border-t border-line/60">
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-2 px-4 py-5 text-xs text-muted sm:flex-row sm:px-6">
           <p>© 2026 PrintMate AI. All rights reserved.</p>
-          <p className="rounded-full border border-line bg-ink px-3 py-1">
+          <p className="rounded-full border border-line bg-paper px-3 py-1">
             Demo storefront — payments in Stripe test mode
           </p>
         </div>
