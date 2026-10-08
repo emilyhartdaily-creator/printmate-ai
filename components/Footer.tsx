@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { CATEGORY_LABELS, COLLECTION_META, type CollectionSlug } from '@/lib/types';
+import { CATEGORY_LABELS, categoryLabel, COLLECTION_META, type CollectionSlug } from '@/lib/types';
 
 const CATEGORY_SLUGS = Object.keys(CATEGORY_LABELS) as (keyof typeof CATEGORY_LABELS)[];
 const COLLECTION_SLUGS = Object.keys(COLLECTION_META) as CollectionSlug[];
@@ -31,7 +31,7 @@ export default function Footer() {
                   href={`/shop?category=${c}`}
                   className="text-zinc-300 transition hover:text-white"
                 >
-                  {CATEGORY_LABELS[c]}
+                  {categoryLabel(c)}
                 </Link>
               </li>
             ))}
