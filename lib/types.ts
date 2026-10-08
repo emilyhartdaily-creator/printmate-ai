@@ -99,6 +99,16 @@ export const CATEGORY_LABELS: Record<ProductCategory, string> = {
   stickers: 'Stickers',
 };
 
+/** Pretty label for any category slug, including custom ones added in admin. */
+export function categoryLabel(cat: string): string {
+  const known = (CATEGORY_LABELS as Record<string, string>)[cat];
+  if (known) return known;
+  return cat
+    .replace(/[-_]+/g, ' ')
+    .replace(/\b\w/g, (c) => c.toUpperCase())
+    .trim();
+}
+
 export const COLLECTION_META: Record<
   CollectionSlug,
   { title: string; tagline: string }
