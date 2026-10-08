@@ -5,6 +5,7 @@ import { useMemo, useState } from 'react';
 import { useCart } from '@/lib/cart';
 import { formatPrice } from '@/lib/format';
 import type { Product } from '@/lib/types';
+import DesignAgentChat from './DesignAgentChat';
 
 const STYLE_CHIPS = [
   'retro',
@@ -29,6 +30,9 @@ function resolveImageUrl(data: StudioResponse): string | null {
 
 export default function StudioClient({ products }: { products: Product[] }) {
   const { addItem } = useCart();
+
+  // Chat vs. manual form mode
+  const [mode, setMode] = useState<'chat' | 'form'>('chat');
 
   // Step 1: design generation
   const [prompt, setPrompt] = useState('');
@@ -107,7 +111,43 @@ export default function StudioClient({ products }: { products: Product[] }) {
         Describe your design, generate it with AI, then put it on any product.
       </p>
 
-      <div className="mt-8 grid gap-8 lg:grid-cols-2">
+      <div
+        className="mt-6 inline-flex rounded-xl border border-line bg-surface p-1"
+        role="tablist"
+        aria-label="Studio mode"
+      >
+        <button
+          type="button"
+          role="tab"
+          aria-selected={mode === 'chat'}
+          onClick={() => setMode('chat')}
+          className={`rounded-lg px-4 py-2 text-sm font-bold transition ${
+            mode === 'chat'
+              ? 'bg-brand-600 text-white'
+              : 'text-muted hover:text-zinc-100'
+          }`}
+        >
+          💬 Chat with the designer
+        </button>
+        <button
+          type="button"
+          role="tab"
+          aria-selected={mode === 'form'}
+          onClick={() => setMode('form')}
+          className={`rounded-lg px-4 py-2 text-sm font-bold transition ${
+            mode === 'form'
+              ? 'bg-brand-600 text-white'
+              : 'text-muted hover:text-zinc-100'
+          }`}
+        >
+          ✍️ Write it yourself
+        </button>
+      </div>
+
+      {mode === 'chat' ? (
+        <DesignAgentChat products={products} />
+      ) : (
+        <div className="mt-8 grid gap-8 lg:grid-cols-2">
         {/* Step 1 */}
         <div className="card">
           <p className="font-display text-lg font-bold">
@@ -268,7 +308,8 @@ export default function StudioClient({ products }: { products: Product[] }) {
             </div>
           )}
         </div>
-      </div>
+        </div>
+      )}
     </div>
   );
 }
