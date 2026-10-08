@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { useCart } from '@/lib/cart';
 import { formatPrice } from '@/lib/format';
-import { CATEGORY_LABELS, type Product } from '@/lib/types';
+import { categoryLabel, type Product } from '@/lib/types';
 
 export default function ProductDetail({
   product,
@@ -59,7 +59,7 @@ export default function ProductDetail({
             />
           )}
           <span className="badge absolute left-4 top-4 !bg-ink/70 backdrop-blur">
-            {CATEGORY_LABELS[product.category]}
+            {categoryLabel(product.category)}
           </span>
         </div>
 
