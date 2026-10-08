@@ -4,6 +4,9 @@ import ShopClient from '@/components/ShopClient';
 import { getProducts } from '@/lib/products';
 import { CATEGORY_LABELS } from '@/lib/types';
 
+
+// Revalidate catalog data every 5 minutes so admin/DB changes go live without a redeploy.
+export const revalidate = 300;
 export default async function ShopPage({
   searchParams,
 }: {
